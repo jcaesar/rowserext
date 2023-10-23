@@ -1,0 +1,24 @@
+[package]
+name = "join_on_time"
+version = "0.1.0"
+authors = ["Julius Michaelis"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+path = "lib.rs"
+name = "ext"
+
+[dependencies]
+anyhow = "1.0.75"
+chrono = "0.4.31"
+gloo = "0.10.0"
+itertools = "0.11.0"
+wasm-bindgen = "0.2.74"
+web-sys = { version = "0.3.64", features = ["Window", "Document", "console", "HtmlBodyElement", "CssStyleDeclaration", "HtmlCollection", "HtmlButtonElement", "DomTokenList"] }
+
+[profile.maxopt]
+inherits = "release"
+lto = "fat"
+codegen-units = 1
+strip = "debuginfo"

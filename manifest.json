@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Join Teams on Time",
+  "version": "0.1",
+  "description": "Adds a red border to all webpages matching mozilla.org.",
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://teams.microsoft.com/*"
+      ],
+      "js": [
+        "pkg/ext.js",
+        "load.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "pkg/ext_bg.wasm"
+  ]
+}
