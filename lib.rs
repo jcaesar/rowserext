@@ -1,11 +1,12 @@
-use std::sync::{Arc, Mutex};
+mod event_stream;
 
-use anyhow::{Context, Result};
-use chrono::{DateTime, Duration, Local};
+use chrono::{DateTime, Duration, Local, NaiveTime};
+use event_stream::EventStream;
+use futures::{select, StreamExt};
 use gloo::{
     dialogs::{alert, prompt},
-    timers::callback::Interval,
-    utils::document,
+    timers::future::IntervalStream,
+    utils::{document, window},
 };
 use itertools::Itertools;
 use wasm_bindgen::prelude::*;
@@ -16,107 +17,125 @@ fn collection_list(c: HtmlCollection) -> impl Iterator<Item = Element> {
 }
 
 #[wasm_bindgen(start)]
-pub fn main() {
-    mein().expect_throw("Failed")
-}
-
-fn mein() -> anyhow::Result<()> {
-    our_btn()?;
-    Ok(())
-}
-
-fn our_btn() -> Result<HtmlButtonElement> {
-    const OUR_ID: &str = "ontimeebc54e68b53d30f5a82f0374edb391f6295b57586dff9a7b";
-    match document().get_element_by_id(OUR_ID) {
-        Some(btn) => Ok(btn
-            .dyn_into()
-            .expect_throw("Timed join button exists, but its weird")),
-        None => {
-            let join_btn = join_btn().context("Main join button not found")?;
-            let our_btn = document()
-                .create_element("button")
-                .expect_throw("create element failed")
-                .dyn_into::<HtmlButtonElement>()
-                .expect_throw("button isn't a button");
-            our_btn.set_id(OUR_ID);
-            our_btn.set_type("button");
-            our_btn.set_text_content(Some("…"));
-            let add_classes = join_btn.class_list();
-            for class in (0..).map_while(|i| add_classes.item(i)) {
-                our_btn
-                    .class_list()
-                    .add_1(&class)
-                    .expect_throw("Can't add class");
+pub async fn main() {
+    console_error_panic_hook::set_once();
+    let hash_changes = &mut EventStream::new(&window(), "hashchange");
+    loop {
+        let mut check = IntervalStream::new(300).take(300);
+        while let Some(()) = check.next().await {
+            if let Some(join_btn) = find_join_btn() {
+                in_join_menu(hash_changes, &join_btn).await;
+                break;
             }
-            join_btn
-                .parent_node()
-                .expect_throw("Join button free floating")
-                .append_child(&our_btn)
-                .expect_throw("Can't append our button");
-            let our_btn_outr = our_btn.clone();
-            let join_by: Arc<Mutex<Option<DateTime<Local>>>> = Arc::new(Mutex::new(None));
-            let join_by_cb = join_by.clone();
-            let cb = move || {
-                *join_by_cb.lock().unwrap() = None;
-                let now = Local::now();
-                let prompt = prompt(
-                    &format!(
-                        "Enter join time (HH:MM:SS) (Now: {})",
-                        now.time().format("%H:%M:%S")
-                    ),
-                    None,
-                );
-                let Some(str) = prompt else {
-                    return;
-                };
-                let parse_from_str = chrono::NaiveTime::parse_from_str;
-                let time = parse_from_str(&str, "%H:%M:%S").or(parse_from_str(&str, "%H:%M"));
-                let Ok(time) = time else {
-                    alert(&format!("Couldn't parse {}", str));
-                    return;
-                };
-                let rel = time - now.time();
-                match rel >= Duration::seconds(0) {
-                    true => rel,
-                    false => rel + Duration::days(1),
-                };
-                *join_by_cb.lock().unwrap() = Some(now + rel);
-            };
-            let cb = Closure::wrap(Box::new(cb) as Box<dyn Fn()>);
-            our_btn_outr.set_onclick(Some(cb.as_ref().unchecked_ref()));
-            cb.forget();
-            let our_btn_ivl = our_btn_outr.clone();
-            Interval::new(1_000, move || {
-                let var_text;
-                let text = match *join_by.lock().unwrap() {
-                    Some(join_by) => {
-                        let now = Local::now();
-                        if now >= join_by {
-                            join_btn.click();
-                            "Joining!"
-                        } else {
-                            let diff = (join_by - now).num_seconds();
-                            var_text = format!(
-                                "Joining in {:02}:{:02}:{:02}…",
-                                diff / 3600,
-                                diff / 60 % 60,
-                                diff % 60
-                            );
-                            &var_text
-                        }
-                    }
-                    None => "Join by …",
-                };
-
-                our_btn_ivl.set_text_content(Some(text));
-            })
-            .forget();
-            Ok(our_btn)
         }
+        hash_changes.next().await.unwrap_throw();
     }
 }
 
-fn join_btn() -> Option<HtmlButtonElement> {
+async fn in_join_menu(hash_changes: &mut EventStream, join_btn: &HtmlButtonElement) {
+    let our_btn = mk_our_btn(join_btn);
+    let clicks = &mut EventStream::new(&our_btn, "click");
+    let ivl = &mut IntervalStream::new(1_000).fuse();
+    let mut join_by: Option<DateTime<Local>> = None;
+    loop {
+        select! {
+            e = clicks.next() => {
+                e.unwrap_throw();
+                join_by = query_time();
+            },
+            e = hash_changes.next() => e.unwrap_throw(),
+            e = ivl.next() => e.unwrap_throw(),
+        }
+        if find_join_btn().is_none() {
+            break;
+        }
+        let now = Local::now();
+        update_btn_text(join_by, now, &our_btn);
+        if let Some(join_by) = join_by {
+            if now >= join_by {
+                join_btn.click();
+                break;
+            }
+        }
+    }
+    if let Some(parent) = our_btn.parent_element() {
+        parent.remove_child(&our_btn).ok();
+    }
+}
+
+fn query_time() -> Option<DateTime<Local>> {
+    let now = Local::now();
+    let str = prompt(
+        &format!(
+            "Enter join time (HH:MM:SS) (Now: {})",
+            now.time().format("%H:%M:%S")
+        ),
+        None,
+    )?;
+    let parse_from_str = chrono::NaiveTime::parse_from_str;
+    let time = parse_from_str(&str, "%H:%M:%S").or(parse_from_str(&str, "%H:%M"));
+    let Ok(time) = time else {
+        alert(&format!("Couldn't parse {}", str));
+        return None;
+    };
+    let rel = time - now.time();
+    let rel = match rel >= Duration::seconds(0) {
+        true => rel,
+        false => rel + Duration::days(1),
+    };
+    Some(now + rel)
+}
+
+fn mk_our_btn(join_btn: &HtmlButtonElement) -> HtmlButtonElement {
+    let our_btn = document()
+        .create_element("button")
+        .expect_throw("create element failed")
+        .dyn_into::<HtmlButtonElement>()
+        .expect_throw("button isn't a button");
+    our_btn.set_type("button");
+    our_btn.set_text_content(Some("…"));
+    let add_classes = join_btn.class_list();
+    for class in (0..).map_while(|i| add_classes.item(i)) {
+        our_btn
+            .class_list()
+            .add_1(&class)
+            .expect_throw("Can't add class");
+    }
+    our_btn.style().set_property("margin-left", "5px").ok();
+    join_btn
+        .parent_node()
+        .expect_throw("Join button free floating")
+        .append_child(&our_btn)
+        .expect_throw("Can't append our button");
+    our_btn
+}
+
+fn update_btn_text(
+    join_by: Option<DateTime<Local>>,
+    now: DateTime<Local>,
+    our_btn: &HtmlButtonElement,
+) {
+    let var_text;
+    let text = match join_by {
+        Some(join_by) => {
+            if now >= join_by {
+                "Joining!"
+            } else {
+                let diff = NaiveTime::from_hms_opt(0, 0, 0).unwrap() + (join_by - now);
+                var_text = format!(
+                    "Joining at {} (in {}…)",
+                    join_by.format("%H:%M:%S"),
+                    diff.format("%H:%M:%S")
+                );
+                &var_text
+            }
+        }
+        None => "Join by …",
+    };
+    our_btn.set_text_content(Some(text));
+}
+
+fn find_join_btn() -> Option<HtmlButtonElement> {
     collection_list(document().get_elements_by_class_name("join-btn"))
         .filter_map(|e| e.dyn_into::<HtmlButtonElement>().ok())
         .filter(|e| e.text_content().as_deref() == Some("Join now"))
