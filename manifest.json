@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Join Teams on Time",
   "version": "0.1",
-  "description": "Adds a red border to all webpages matching mozilla.org.",
+  "description": "Join a Teams meeting at a specified time",
   "icons": {
     "42": "icon.svg"
   },

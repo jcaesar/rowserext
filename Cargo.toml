@@ -1,5 +1,5 @@
 [package]
-name = "join_on_time"
+name = "join-on-time"
 version = "0.1.0"
 authors = ["Julius Michaelis"]
 edition = "2021"
