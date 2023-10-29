@@ -3,12 +3,12 @@ name = "lionel"
 version = "0.1.0"
 authors = ["Julius Michaelis"]
 edition = "2021"
-doc = false
 
 [lib]
 crate-type = ["cdylib"]
 path = "lib.rs"
 name = "ext"
+doc = false
 
 [dependencies]
 chrono = "0.4.31"
@@ -20,5 +20,4 @@ js-sys = "0.3.64"
 once_cell = "1.18.0"
 wasm-bindgen = "0.2.87"
 wasm-bindgen-futures = "0.4.37"
-web-ext-tab-sys = { version = "0.1.0", path = "../web-ext-tab-sys" }
 web-sys = { version = "0.3.64", features = ["Window", "Document", "console", "HtmlBodyElement", "CssStyleDeclaration", "HtmlCollection", "HtmlButtonElement", "DomTokenList"] }

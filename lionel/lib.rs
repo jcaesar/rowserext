@@ -11,7 +11,6 @@ use gloo::{
 use itertools::Itertools;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
-use web_ext_tab_sys;
 use web_sys::{Element, HtmlButtonElement, HtmlCollection};
 
 #[wasm_bindgen(start)]
@@ -24,7 +23,10 @@ pub async fn main() {
 }
 
 pub fn tabs() -> Tabs {
-    Tabs::get_tabs().expect("Not in a tabs supporting browser's web extension")
+    Err(())
+        .or_else(|_| Tabs::browser_get_tabs())
+        .or_else(|_| Tabs::chrome_get_tabs())
+        .expect("Not in a tabs supporting browser's web extension")
 }
 
 #[wasm_bindgen]
@@ -33,7 +35,9 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Tabs;
     #[wasm_bindgen(getter, catch, static_method_of = Tabs, js_class = browser, js_name = tabs)]
-    pub fn get_tabs() -> Result<Tabs, JsValue>;
+    pub fn browser_get_tabs() -> Result<Tabs, JsValue>;
+    #[wasm_bindgen(getter, catch, static_method_of = Tabs, js_class = chrome, js_name = tabs)]
+    pub fn chrome_get_tabs() -> Result<Tabs, JsValue>;
     # [wasm_bindgen (method , structural , js_class = "BrowserTabs" , js_name = query)]
     pub fn query(this: &Tabs, query_details: &TabQueryDetails) -> ::js_sys::Promise;
 }
