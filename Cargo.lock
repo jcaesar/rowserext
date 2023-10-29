@@ -483,7 +483,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "join_on_time"
+name = "js-sys"
+version = "0.3.64"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c5f195fe497f702db0f318b07fdd68edb16955aed830df8363d837542f8f935a"
+dependencies = [
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "libc"
+version = "0.2.149"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a08173bc88b7955d1b3145aa561539096c421ac8debde8cbc3612ec635fee29b"
+
+[[package]]
+name = "lionel"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -498,21 +513,6 @@ dependencies = [
  "web-ext-tab-sys",
  "web-sys",
 ]
-
-[[package]]
-name = "js-sys"
-version = "0.3.64"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c5f195fe497f702db0f318b07fdd68edb16955aed830df8363d837542f8f935a"
-dependencies = [
- "wasm-bindgen",
-]
-
-[[package]]
-name = "libc"
-version = "0.2.149"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a08173bc88b7955d1b3145aa561539096c421ac8debde8cbc3612ec635fee29b"
 
 [[package]]
 name = "log"
@@ -822,6 +822,10 @@ checksum = "ca6ad05a4870b2bf5fe995117d3728437bd27d7cd5f06f13c17443ef369775a1"
 [[package]]
 name = "web-ext-tab-sys"
 version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "web-sys"

@@ -8,6 +8,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 path = "lib.rs"
 name = "ext"
+doc = false
 
 [dependencies]
 chrono = "0.4.31"

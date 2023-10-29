@@ -4,17 +4,17 @@ use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = :: js_sys :: Object , js_name = TabsTab)]
+    # [wasm_bindgen (extends = :: js_sys :: Object , js_name = Tab)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    #[doc = "The `TabsTab` dictionary."]
+    #[doc = "The `Tab` dictionary."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
-    pub type TabsTab;
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
+    pub type Tab;
 }
-impl TabsTab {
-    #[doc = "Construct a new `TabsTab`."]
+impl Tab {
+    #[doc = "Construct a new `Tab`."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn new() -> Self {
         #[allow(unused_mut)]
         let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
@@ -22,7 +22,7 @@ impl TabsTab {
     }
     #[doc = "Change the `active` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn active(&mut self, val: bool) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r =
@@ -36,7 +36,7 @@ impl TabsTab {
     }
     #[doc = "Change the `audible` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn audible(&mut self, val: bool) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -53,7 +53,7 @@ impl TabsTab {
     }
     #[doc = "Change the `favIconUrl` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn fav_icon_url(&mut self, val: Option<&str>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -70,7 +70,7 @@ impl TabsTab {
     }
     #[doc = "Change the `height` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn height(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r =
@@ -84,7 +84,7 @@ impl TabsTab {
     }
     #[doc = "Change the `highlighted` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn highlighted(&mut self, val: bool) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -101,7 +101,7 @@ impl TabsTab {
     }
     #[doc = "Change the `id` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn id(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("id"), &JsValue::from(val));
@@ -114,7 +114,7 @@ impl TabsTab {
     }
     #[doc = "Change the `incognito` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn incognito(&mut self, val: bool) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -131,7 +131,7 @@ impl TabsTab {
     }
     #[doc = "Change the `index` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn index(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("index"), &JsValue::from(val));
@@ -145,7 +145,7 @@ impl TabsTab {
     #[cfg(feature = "TabMutedDetails")]
     #[doc = "Change the `mutedDetails` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabMutedDetails`, `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`, `TabMutedDetails`*"]
     pub fn muted_details(&mut self, val: Option<&TabMutedDetails>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -162,7 +162,7 @@ impl TabsTab {
     }
     #[doc = "Change the `openerTabId` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn opener_tab_id(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -179,7 +179,7 @@ impl TabsTab {
     }
     #[doc = "Change the `pinned` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn pinned(&mut self, val: bool) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r =
@@ -193,7 +193,7 @@ impl TabsTab {
     }
     #[doc = "Change the `sessionId` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn session_id(&mut self, val: Option<&str>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -210,7 +210,7 @@ impl TabsTab {
     }
     #[doc = "Change the `status` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn status(&mut self, val: Option<&str>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r =
@@ -224,7 +224,7 @@ impl TabsTab {
     }
     #[doc = "Change the `title` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn title(&mut self, val: Option<&str>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("title"), &JsValue::from(val));
@@ -237,7 +237,7 @@ impl TabsTab {
     }
     #[doc = "Change the `url` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn url(&mut self, val: Option<&str>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("url"), &JsValue::from(val));
@@ -250,7 +250,7 @@ impl TabsTab {
     }
     #[doc = "Change the `width` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn width(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("width"), &JsValue::from(val));
@@ -263,7 +263,7 @@ impl TabsTab {
     }
     #[doc = "Change the `windowId` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `TabsTab`*"]
+    #[doc = "*This API requires the following crate features to be activated: `Tab`*"]
     pub fn window_id(&mut self, val: i32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
@@ -279,7 +279,7 @@ impl TabsTab {
         self
     }
 }
-impl Default for TabsTab {
+impl Default for Tab {
     fn default() -> Self {
         Self::new()
     }

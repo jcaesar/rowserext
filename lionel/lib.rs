@@ -11,6 +11,7 @@ use gloo::{
 use itertools::Itertools;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
+use web_ext_tab_sys;
 use web_sys::{Element, HtmlButtonElement, HtmlCollection};
 
 #[wasm_bindgen(start)]

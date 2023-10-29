@@ -3,7 +3,7 @@ enum RunAt { "document_end", "document_idle", "document_start" };
 enum TabStatus { "complete", "loading" };
 enum WindowTypes { "app", "normal", "panel", "popup" };
 enum TabsCaptureVisibleTabFormat { "jpeg", "png" };
-dictionary TabsTab {
+dictionary Tab {
     boolean active;
     boolean audible;
     DOMString? favIconUrl;
@@ -100,25 +100,25 @@ dictionary TabsOnUpdatedChangeDetails {
 callback TabsOnActivatedCallback = void (TabIdWindowId activeDetails);
 callback TabsOnCreatedCallback = void (TabTab tab);
 callback TabsOnRemovedCallback = void (long tabId, TabsWindowIdIsWindowClosing removeDetails);
-callback TabsOnUpdatedCallback = void (long tabId, TabsOnUpdatedChangeDetails details, TabsTab tab);
+callback TabsOnUpdatedCallback = void (long tabId, TabsOnUpdatedChangeDetails details, Tab tab);
 [NoInterfaceObject]
-interface BrowserTabs {
+interface Tabs {
     Promise<DOMString> captureVisibleTab(long windowId, TabsCaptureVisibleTabDetails details);
     RuntimePort connect(long tabId, TabConnectDetails details);
-    Promise<TabsTab> create(TabCreateDetails details);
+    Promise<Tab> create(TabCreateDetails details);
     void executeScript(long tabId, TabScriptAndCSSDetails details);
-    Promise<TabsTab> get(long tabId);
-    Promise<TabsTab> getCurrent();
+    Promise<Tab> get(long tabId);
+    Promise<Tab> getCurrent();
     void insertCSS(long tabId, TabScriptAndCSSDetails details);
     void onActivated(TabsOnActivatedCallback callback);
     void onCreated(TabsOnCreatedCallback callback);
     void onRemoved(TabsOnRemovedCallback callback);
     void onUpdated(TabsOnUpdatedCallback callback);
-    Promise<TabsTab> query(TabQueryDetails queryDetails);
+    Promise<Tab> query(TabQueryDetails queryDetails);
     Promise<void> reload(TabReloadDetails details);
     Promise<void> remove((long or sequence<long>) tabIds);
     Promise<any> sendMessage(long tabId, any message, optional TabSendMessageOptions details);
-    Promise<TabsTab> update(long tabId, TabUpdateDetails details);
+    Promise<Tab> update(long tabId, TabUpdateDetails details);
 };
 [NoInterfaceObject, Exposed=Window, CheckAnyPermissions="browserExtTabs"]
 interface TabsAPI {

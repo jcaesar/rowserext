@@ -12,4 +12,12 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `TabsApi`*"]
     pub type TabsApi;
+    #[cfg(feature = "Tabs")]
+    # [wasm_bindgen (structural , method , getter , js_class = "TabsAPI" , js_name = tabs)]
+    #[doc = "Getter for the `tabs` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/TabsAPI/tabs)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `Tabs`, `TabsApi`*"]
+    pub fn tabs(this: &TabsApi) -> Tabs;
 }

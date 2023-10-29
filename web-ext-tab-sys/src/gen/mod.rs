@@ -1,14 +1,14 @@
-#[cfg(feature = "BrowserTabs")]
-#[allow(non_snake_case)]
-mod gen_BrowserTabs;
-#[cfg(feature = "BrowserTabs")]
-pub use gen_BrowserTabs::*;
-
 #[cfg(feature = "RunAt")]
 #[allow(non_snake_case)]
 mod gen_RunAt;
 #[cfg(feature = "RunAt")]
 pub use gen_RunAt::*;
+
+#[cfg(feature = "Tab")]
+#[allow(non_snake_case)]
+mod gen_Tab;
+#[cfg(feature = "Tab")]
+pub use gen_Tab::*;
 
 #[cfg(feature = "TabConnectDetails")]
 #[allow(non_snake_case)]
@@ -76,6 +76,12 @@ mod gen_TabUpdateDetails;
 #[cfg(feature = "TabUpdateDetails")]
 pub use gen_TabUpdateDetails::*;
 
+#[cfg(feature = "Tabs")]
+#[allow(non_snake_case)]
+mod gen_Tabs;
+#[cfg(feature = "Tabs")]
+pub use gen_Tabs::*;
+
 #[cfg(feature = "TabsApi")]
 #[allow(non_snake_case)]
 mod gen_TabsApi;
@@ -99,12 +105,6 @@ pub use gen_TabsCaptureVisibleTabFormat::*;
 mod gen_TabsOnUpdatedChangeDetails;
 #[cfg(feature = "TabsOnUpdatedChangeDetails")]
 pub use gen_TabsOnUpdatedChangeDetails::*;
-
-#[cfg(feature = "TabsTab")]
-#[allow(non_snake_case)]
-mod gen_TabsTab;
-#[cfg(feature = "TabsTab")]
-pub use gen_TabsTab::*;
 
 #[cfg(feature = "TabsWindowIdIsWindowClosing")]
 #[allow(non_snake_case)]
