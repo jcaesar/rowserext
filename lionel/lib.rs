@@ -14,9 +14,6 @@ use wasm_bindgen_futures::JsFuture;
 pub async fn main() {
     console_error_panic_hook::set_once();
     dioxus_web::launch(|cx| {
-        //use_shared_state_provider(cx, || Vec::<Tab>::new());
-        //let tabs_state = use_shared_state::<Vec<Tab>>(cx).unwrap();
-        //let tabs = &*tabs_state.read();
         let tabs = use_future(cx, (), |_| async move {
             let tabs = api().query(TabQueryDetails::new().pinned(false));
             let tabs = JsFuture::from(tabs)
@@ -32,30 +29,11 @@ pub async fn main() {
         });
         let out = match tabs.value() {
             Some(tabs) => {
-                let f = |tab: &&Tab| tab.url();
-                let key = "URL";
-                let same = tabs.into_iter().into_group_map_by(f);
-                let same = same
-                    .into_iter()
-                    .filter(|(_, tabs)| tabs.len() > 1)
-                    .sorted_by_key(|(_url, tabs)| tabs.len())
-                    .rev()
-                    .collect::<Vec<_>>();
                 rsx! {
-                    h2 { "Tabs by {key}" }
-                    table {
-                        tr {
-                            id: "head",
-                            th { "Count" }
-                            th { "{key}" }
-                        }
-                        for (url, tabs) in &same {
-                            tr {
-                                id: "{url}",
-                                td { "{tabs.len()}" }
-                                td { "{url}" }
-                            }
-                        }
+                    tab_group_list {
+                        tabs: tabs,
+                        keyname: "URL",
+                        grouper: |tab: &Tab| tab.url()
                     }
                 }
             }
@@ -63,4 +41,37 @@ pub async fn main() {
         };
         cx.render(out)
     });
+}
+
+#[inline_props]
+fn tab_group_list<'a, F: Fn(&Tab) -> String>(
+    cx: Scope<'a>,
+    tabs: &'a [Tab],
+    keyname: &'a str,
+    grouper: F,
+) -> Element<'a> {
+    let same = tabs.into_iter().into_group_map_by(|t| grouper(t));
+    let same = same
+        .into_iter()
+        .filter(|(_, tabs)| tabs.len() > 1)
+        .sorted_by_key(|(_url, tabs)| tabs.len())
+        .rev()
+        .collect::<Vec<_>>();
+    cx.render(rsx! {
+        h2 { "Tabs by {keyname}" }
+        table {
+            tr {
+                id: "head",
+                th { "Count" }
+                th { "{keyname}" }
+            }
+            for (url, tabs) in &same {
+                tr {
+                    id: "{url}",
+                    td { "{tabs.len()}" }
+                    td { "{url}" }
+                }
+            }
+        }
+    })
 }
