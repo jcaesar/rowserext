@@ -18,6 +18,8 @@ extern "C" {
     pub fn chrome_get_tabs() -> Result<Tabs, JsValue>;
     # [wasm_bindgen (method , structural , js_class = "BrowserTabs" , js_name = query)]
     pub fn query(this: &Tabs, query_details: &TabQueryDetails) -> ::js_sys::Promise;
+    # [wasm_bindgen (method , structural , js_class = "BrowserTabs" , js_name = remove)]
+    pub fn remove(this: &Tabs, id: u32) -> ::js_sys::Promise;
 }
 
 #[wasm_bindgen]
@@ -62,4 +64,6 @@ extern "C" {
     pub type Tab;
     # [wasm_bindgen (structural , method , getter , js_class = "Tab" , js_name = url)]
     pub fn url(this: &Tab) -> String;
+    # [wasm_bindgen (structural , method , getter , js_class = "Tab" , js_name = id)]
+    pub fn id(this: &Tab) -> u32;
 }
