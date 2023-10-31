@@ -1,14 +1,17 @@
 mod tabs;
 
 use crate::tabs::TabQueryDetails;
+use cached::proc_macro::cached;
 use dioxus::prelude::*;
 use futures::StreamExt;
+#[allow(unused_imports)]
+use gloo::console::log;
 use gloo::timers::future::sleep;
 use itertools::Itertools;
 use js_sys::Array;
 use once_cell::sync::Lazy;
-use std::{cmp::Reverse, time::Duration};
-use tabs::Tab;
+use std::{borrow::Cow, cmp::Reverse, time::Duration};
+use tabs::{EagerTab, Tab, TabId};
 use tldextract::TldExtractor;
 use url::Url;
 use wasm_bindgen::prelude::*;
@@ -68,7 +71,7 @@ pub async fn main() {
                             "Reload"
                         }
                     }
-                    tab_group_list {
+                    tab_group_output {
                         tabs: tabs,
                         group_by: **group_by,
                         display_max: **display_max,
@@ -81,62 +84,38 @@ pub async fn main() {
     });
 }
 
-async fn get_tabs() -> Vec<Tab> {
+async fn get_tabs() -> Vec<EagerTab> {
     let tabs = tabs::api().query(TabQueryDetails::new().pinned(false));
     let tabs = JsFuture::from(tabs)
         .await
         .expect("Get tab list failed")
         .dyn_into::<Array>()
         .expect("Tab query didn't return list");
-    let tabs = tabs.iter().map(|tab| tab.unchecked_into()).collect();
+    let tabs = tabs
+        .iter()
+        .map(|tab| tab.unchecked_into::<Tab>().eager())
+        .sorted()
+        .collect();
     tabs
 }
 
-type TabId = u32;
-
 #[inline_props]
-fn tab_group_list<'a>(
+fn tab_group_output<'a>(
     cx: Scope<'a>,
-    tabs: &'a [Tab],
+    tabs: &'a [EagerTab],
     group_by: GroupBy,
     display_max: usize,
 ) -> Element<'a> {
-    let mut same = tabs
-        .iter()
-        .into_grouping_map_by(|t| group_by.group(t))
-        .fold(vec![], |mut acc, _key, tab| {
-            acc.push(tab.id());
-            acc
-        });
-    for (_, ids) in &mut same {
-        ids.sort();
-    }
-    let same_count = same
-        .iter()
-        .into_group_map_by(|(_, v)| v.len())
-        .into_iter()
-        .sorted()
-        .rev()
-        .collect::<Vec<_>>();
-    let mut same = vec![];
-    for (_, groups) in same_count {
-        if same.len() + groups.len() > *display_max {
-            break;
-        }
-        same.extend_from_slice(&groups);
-    }
-    same.sort_by_key(|(key, tabs)| (Reverse(tabs.len()), *key, tabs[0]));
     let closed = use_state(cx, || 0);
     let to_close = use_state(cx, || 0);
     let close_tabs = use_coroutine(cx, |mut rx: UnboundedReceiver<Vec<TabId>>| {
         let mut closed = closed.clone();
         async move {
+            let tabs = tabs::api();
             loop {
                 while let Some(remove) = rx.next().await {
                     for remove in remove {
-                        JsFuture::from(tabs::api().remove(remove))
-                            .await
-                            .expect("TODO");
+                        JsFuture::from(tabs.remove(remove)).await.expect("TODO");
                         closed += 1;
                         sleep(Duration::from_millis(1)).await;
                     }
@@ -144,16 +123,16 @@ fn tab_group_list<'a>(
             }
         }
     });
-    let show_count = same.iter().map(|(_, v)| v.len()).sum::<usize>();
-    let todo = match **to_close {
-        0 => String::new(),
-        _ => format!(" Closed {closed}, {} pending.", **to_close - **closed),
-    };
+    let todo = format!(
+        "{closed} closed, {} pending, {} total.",
+        **to_close - **closed,
+        tabs.len() - **closed
+    );
     let keyname = group_by.name();
     cx.render(rsx! {
         h2 { "Tabs by {keyname}" }
         p {
-            "Showing {show_count} of {tabs.len()}.{todo}"
+            "{todo}"
         }
         table {
             tr {
@@ -165,17 +144,13 @@ fn tab_group_list<'a>(
                     "{keyname}"
                 }
             }
-            for (url, tabs) in same {
-                Fragment {
-                    key: "{url}",
-                    tab_group {
-                        url: url.to_string(),
-                        tabs: tabs.to_vec(),
-                        close_tabs: move |tabs| {
-                            to_close.set(*to_close.current() + tabs.len()); // += causes lifetime issues. -.-
-                            close_tabs.send(tabs);
-                        },
-                    }
+            tab_group_rows {
+                tabs: tabs,
+                group_by: group_by.clone(),
+                display_max: *display_max,
+                close_tabs: move |tabs| {
+                    to_close.set(*to_close.current() + tabs.len()); // += causes lifetime issues. -.-
+                    close_tabs.send(tabs);
                 }
             }
         }
@@ -183,12 +158,74 @@ fn tab_group_list<'a>(
 }
 
 #[inline_props]
-fn tab_group<F: Fn(Vec<TabId>)>(
+fn tab_group_rows<'a, F: Fn(Vec<TabId>)>(
     cx: Scope<'a>,
+    tabs: &'a [EagerTab],
+    group_by: GroupBy,
+    display_max: usize,
+    close_tabs: F,
+) -> Element<'a> {
+    log!("Re!");
+    let same = group_tabs(tabs.to_vec(), *group_by, *display_max);
+    cx.render(rsx! {
+        for (url, tabs) in same {
+            Fragment {
+                key: "{url}",
+                tab_group {
+                    id: url.to_string(),
+                    url: url.to_string(),
+                    tabs: tabs.to_vec(),
+                    close_tabs: close_tabs,
+                }
+            }
+        }
+    })
+}
+
+#[cached(size = 1)]
+fn group_tabs(
+    tabs: Vec<EagerTab>,
+    group_by: GroupBy,
+    display_max: usize,
+) -> Vec<(String, Vec<u32>)> {
+    let mut same = tabs
+        .iter()
+        .into_grouping_map_by(|t| group_by.group(t))
+        .fold(vec![], |mut acc, _key, tab| {
+            acc.push(tab.id);
+            acc
+        });
+    for (_, ids) in &mut same {
+        ids.sort();
+    }
+    let same_count = same
+        .into_iter()
+        .map(|(k, v)| (k.to_string(), v))
+        .into_group_map_by(|(_, v)| v.len())
+        .into_iter()
+        .sorted()
+        .rev()
+        .collect::<Vec<_>>();
+    let mut same = vec![];
+    for (_, groups) in same_count {
+        if same.len() + groups.len() > display_max {
+            break;
+        }
+        same.extend_from_slice(&groups);
+    }
+    same.sort_by_key(|(_key, tabs)| (Reverse(tabs.len()), tabs[0]));
+    same
+}
+
+#[inline_props]
+fn tab_group<F: Fn(Vec<TabId>)>(
+    cx: Scope,
+    id: String,
     close_tabs: F,
     url: String,
     tabs: Vec<TabId>,
 ) -> Element {
+    let _ = id;
     let pressed = use_state(cx, || false);
     let pressed_hidden = match **pressed {
         true => "visibility: hidden",
@@ -237,7 +274,7 @@ fn tab_group<F: Fn(Vec<TabId>)>(
 static TLDEX: Lazy<TldExtractor> =
     Lazy::new(|| TldExtractor::new(tldextract::TldOption::default()));
 
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 enum GroupBy {
     Url,
     Origin,
@@ -255,16 +292,16 @@ impl GroupBy {
             GroupBy::Origin => "Origin",
         }
     }
-    fn group(&self, tab: &Tab) -> String {
-        let url = tab.url();
+    fn group<'a>(&self, tab: &'a EagerTab) -> Cow<'a, str> {
+        let url = Cow::Borrowed(tab.url.as_str());
         match self {
             GroupBy::Url => url,
             GroupBy::Origin => match Url::parse(&url) {
                 Ok(parsed) => match parsed.origin() {
                     url::Origin::Opaque(_) => url,
                     url::Origin::Tuple(scheme, host, port) => match parsed.port().is_none() {
-                        true => format!("{scheme}://{host}"),
-                        false => format!("{scheme}://{host}:{port}"),
+                        true => format!("{scheme}://{host}").into(),
+                        false => format!("{scheme}://{host}:{port}").into(),
                     },
                 },
                 Err(_) => url,
@@ -274,7 +311,7 @@ impl GroupBy {
                     domain: Some(domain),
                     suffix: Some(suffix),
                     ..
-                }) => format!("{domain}.{suffix}"),
+                }) => format!("{domain}.{suffix}").into(),
                 _ => GroupBy::Origin.group(tab),
             },
         }

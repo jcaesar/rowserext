@@ -1,3 +1,4 @@
+use js_sys::Array;
 use wasm_bindgen::prelude::*;
 
 pub fn api() -> Tabs {
@@ -20,6 +21,8 @@ extern "C" {
     pub fn query(this: &Tabs, query_details: &TabQueryDetails) -> ::js_sys::Promise;
     # [wasm_bindgen (method , structural , js_class = "BrowserTabs" , js_name = remove)]
     pub fn remove(this: &Tabs, id: u32) -> ::js_sys::Promise;
+    # [wasm_bindgen (method , structural , js_class = "BrowserTabs" , js_name = remove)]
+    pub fn remove_with_array(this: &Tabs, ids: Array) -> ::js_sys::Promise;
 }
 
 #[wasm_bindgen]
@@ -63,7 +66,28 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type Tab;
     # [wasm_bindgen (structural , method , getter , js_class = "Tab" , js_name = url)]
+    pub fn title(this: &Tab) -> String;
+    # [wasm_bindgen (structural , method , getter , js_class = "Tab" , js_name = url)]
     pub fn url(this: &Tab) -> String;
     # [wasm_bindgen (structural , method , getter , js_class = "Tab" , js_name = id)]
     pub fn id(this: &Tab) -> u32;
+}
+
+impl Tab {
+    pub fn eager(&self) -> EagerTab {
+        EagerTab {
+            title: self.title(),
+            url: self.url(),
+            id: self.id(),
+        }
+    }
+}
+
+pub type TabId = u32;
+
+#[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Clone)]
+pub struct EagerTab {
+    pub id: TabId,
+    pub url: String,
+    pub title: String,
 }
