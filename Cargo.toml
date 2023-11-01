@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+	"borderify",
 	"join-on-time",
 	"lionel",
 ]
