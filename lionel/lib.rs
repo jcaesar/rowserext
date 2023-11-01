@@ -14,8 +14,6 @@ use url::Url;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
-// TODO: open settings through browser.runtime.openOptionsPage() through https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/onClickeda
-
 #[wasm_bindgen(start)]
 pub async fn main() {
     console_error_panic_hook::set_once();

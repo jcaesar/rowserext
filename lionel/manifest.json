@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Foo",
+  "name": "Lionel",
   "version": "0.1",
-  "description": "Foo",
+  "description": "Tab group cleaner",
   "icons": {
     "42": "icon.svg"
   },
@@ -18,7 +18,11 @@
   },
   "background": {
     "scripts": [
-      "pkg/ext.js"
+      "pkg/ext.js",
+      "action.js"
     ]
+  },
+  "browser_action": {
+    "default_title": "Take out trash"
   }
 }
