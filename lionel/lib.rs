@@ -166,13 +166,16 @@ fn tab_group_list<'a>(
                 }
             }
             for (url, tabs) in same {
-                tab_group {
-                    url: url.to_string(),
-                    tabs: tabs.to_vec(),
-                    close_tabs: move |tabs| {
-                        to_close.set(*to_close.current() + tabs.len()); // += causes lifetime issues. -.-
-                        close_tabs.send(tabs);
-                    },
+                Fragment {
+                    key: "{url}",
+                    tab_group {
+                        url: url.to_string(),
+                        tabs: tabs.to_vec(),
+                        close_tabs: move |tabs| {
+                            to_close.set(*to_close.current() + tabs.len()); // += causes lifetime issues. -.-
+                            close_tabs.send(tabs);
+                        },
+                    }
                 }
             }
         }
