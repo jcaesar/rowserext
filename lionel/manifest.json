@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Lionel",
+  "name": "Tab group cleaner",
   "version": "0.1",
-  "description": "Tab group cleaner",
+  "description": "Group tabs by URL or Host and remove duplicates",
   "icons": {
     "42": "icon.svg"
   },
