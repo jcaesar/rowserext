@@ -9,6 +9,7 @@ use gloo::{
     utils::{document, window},
 };
 use itertools::Itertools;
+use std::iter;
 use wasm_bindgen::prelude::*;
 use web_sys::{Element, HtmlButtonElement, HtmlCollection};
 
@@ -136,7 +137,15 @@ fn update_btn_text(
 }
 
 fn find_join_btn() -> Option<HtmlButtonElement> {
-    collection_list(document().get_elements_by_class_name("join-btn"))
+    iter::empty()
+        .chain(
+            document()
+                .get_element_by_id("prejoin-join-button")
+                .into_iter(),
+        )
+        .chain(collection_list(
+            document().get_elements_by_class_name("join-btn"),
+        ))
         .filter_map(|e| e.dyn_into::<HtmlButtonElement>().ok())
         .filter(|e| e.text_content().as_deref() == Some("Join now"))
         .exactly_one()
