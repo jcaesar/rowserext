@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Join Teams on Time",
   "version": "0.1",
   "description": "Join a Teams meeting at a specified time",
@@ -23,13 +23,6 @@
     }
   ],
   "web_accessible_resources": [
-    {
-      "matches": [
-        "https://teams.microsoft.com/*"
-      ],
-      "resources": [
-        "pkg/ext_bg.wasm"
-      ]
-    }
+    "pkg/ext_bg.wasm"
   ]
 }
