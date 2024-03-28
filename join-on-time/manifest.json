@@ -3,6 +3,11 @@
   "name": "Join Teams on Time",
   "version": "0.1",
   "description": "Join a Teams meeting at a specified time",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "rowserext-join-on-time@liftm.de"
+    }
+  },
   "icons": {
     "42": "icon.svg"
   },

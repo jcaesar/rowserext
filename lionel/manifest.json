@@ -3,6 +3,11 @@
   "name": "Tab group cleaner",
   "version": "0.1",
   "description": "Group tabs by URL or Host and remove duplicates",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "rowserext-lionel@liftm.de"
+    }
+  },
   "icons": {
     "42": "icon.svg"
   },
