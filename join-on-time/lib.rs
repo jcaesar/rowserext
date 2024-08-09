@@ -2,7 +2,11 @@ mod event_stream;
 
 use chrono::{DateTime, Duration, Local, NaiveTime};
 use event_stream::EventStream;
-use futures::{select, StreamExt};
+use futures::{
+    select,
+    stream::{select, FusedStream},
+    Stream, StreamExt,
+};
 use gloo::{
     dialogs::{alert, prompt},
     timers::future::IntervalStream,
@@ -21,19 +25,24 @@ fn collection_list(c: HtmlCollection) -> impl Iterator<Item = Element> {
 pub async fn main() {
     console_error_panic_hook::set_once();
     let hash_changes = &mut EventStream::new(&window(), "hashchange");
+    let focus = &mut EventStream::new(&document(), "focus");
+    let activity = &mut select(hash_changes, focus);
     loop {
         let mut check = IntervalStream::new(300).take(300);
         while let Some(()) = check.next().await {
             if let Some(join_btn) = find_join_btn() {
-                in_join_menu(hash_changes, &join_btn).await;
+                in_join_menu(activity, &join_btn).await;
                 break;
             }
         }
-        hash_changes.next().await.unwrap_throw();
+        activity.next().await.unwrap_throw();
     }
 }
 
-async fn in_join_menu(hash_changes: &mut EventStream, join_btn: &HtmlButtonElement) {
+async fn in_join_menu<S>(activity: &mut S, join_btn: &HtmlButtonElement)
+where
+    S: Stream<Item = ()> + Unpin + FusedStream,
+{
     let our_btn = mk_our_btn(join_btn);
     let clicks = &mut EventStream::new(&our_btn, "click");
     let ivl = &mut IntervalStream::new(1_000).fuse();
@@ -44,7 +53,7 @@ async fn in_join_menu(hash_changes: &mut EventStream, join_btn: &HtmlButtonEleme
                 e.unwrap_throw();
                 join_by = query_time();
             },
-            e = hash_changes.next() => e.unwrap_throw(),
+            e = activity.next() => e.unwrap_throw(),
             e = ivl.next() => e.unwrap_throw(),
         }
         if find_join_btn().is_none() {
