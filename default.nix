@@ -19,9 +19,9 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = let
     wasm-bindgen = wasm-bindgen-cli.override {
-      version = "0.2.87";
-      hash = "sha256-0u9bl+FkXEK2b54n7/l9JOCtKo+pb42GF9E1EnAUQa0=";
-      cargoHash = "sha256-AsZBtE2qHJqQtuCt/wCAgOoxYMfvDh8IzBPAOkYSYko=";
+      version = "0.2.93";
+      hash = "sha256-DDdu5mM3gneraM85pAepBXWn3TMofarVR4NbjMdz3r0=";
+      cargoHash = "sha256-birrg+XABBHHKJxfTKAMSlmTVYLmnmqMDfRnmG6g/YQ=";
     };
   in [
     just
