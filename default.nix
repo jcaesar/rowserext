@@ -1,6 +1,6 @@
 {
   lib,
-  wasm-bindgen-cli,
+  wasm-bindgen-cli_0_2_93, # likely, I'll have to switch to buildWasmBindgenCli in the not-too-far future
   rustc,
   rustPlatform,
   stdenv,
@@ -17,17 +17,11 @@ stdenv.mkDerivation {
     lockFile = ./Cargo.lock;
   };
 
-  nativeBuildInputs = let
-    wasm-bindgen = wasm-bindgen-cli.override {
-      version = "0.2.93";
-      hash = "sha256-DDdu5mM3gneraM85pAepBXWn3TMofarVR4NbjMdz3r0=";
-      cargoHash = "sha256-birrg+XABBHHKJxfTKAMSlmTVYLmnmqMDfRnmG6g/YQ=";
-    };
-  in [
+  nativeBuildInputs = [
     just
     rustc.llvmPackages.lld
     cargo
-    wasm-bindgen
+    wasm-bindgen-cli_0_2_93
     rustPlatform.cargoSetupHook
     web-ext
   ];
