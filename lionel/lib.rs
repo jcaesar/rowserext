@@ -10,7 +10,7 @@ use gloo::timers::future::sleep;
 use itertools::Itertools;
 use js_sys::Array;
 use once_cell::sync::Lazy;
-use std::{borrow::Cow, cmp::Reverse, time::Duration};
+use std::{borrow::Cow, cmp::Reverse, sync::Arc, time::Duration};
 use tabs::{EagerTab, Tab, TabId};
 use tldextract::TldExtractor;
 use url::Url;
@@ -20,11 +20,11 @@ use wasm_bindgen_futures::JsFuture;
 #[wasm_bindgen(start)]
 pub async fn main() {
     console_error_panic_hook::set_once();
-    dioxus_web::launch(|cx| {
-        let get_tabs = use_future(cx, (), |()| get_tabs());
-        let display_max = use_state(cx, || 20);
-        let group_by = use_state(cx, || GroupBy::Url);
-        let out = match get_tabs.value() {
+    LaunchBuilder::web().launch(|| {
+        let mut get_tabs = use_resource(|| get_tabs());
+        let mut display_max = use_signal(|| 20);
+        let mut group_by = use_signal(|| GroupBy::Url);
+        let out = match get_tabs() {
             Some(tabs) => {
                 rsx! {
                     h1 { "Lionel" }
@@ -56,8 +56,8 @@ pub async fn main() {
                     p {
                         "Display "
                         input {
-                            oninput: |event| {
-                                if let Ok(n) = event.value.trim().parse() {
+                            oninput: move |event| {
+                                if let Ok(n) = event.value().trim().parse() {
                                     display_max.set(n)
                                 }
                             },
@@ -67,24 +67,24 @@ pub async fn main() {
                     }
                     p {
                         button {
-                            onclick: |_| get_tabs.restart(),
+                            onclick: move |_| get_tabs.restart(),
                             "Reload"
                         }
                     }
                     tab_group_output {
                         tabs: tabs,
-                        group_by: **group_by,
-                        display_max: **display_max,
+                        group_by: group_by(),
+                        display_max: display_max(),
                     }
                 }
             }
             None => rsx! { p { "Retrieving tab list..." } },
         };
-        cx.render(out)
+        out
     });
 }
 
-async fn get_tabs() -> Vec<EagerTab> {
+async fn get_tabs() -> Arc<Vec<EagerTab>> {
     let tabs = tabs::api().query(TabQueryDetails::new().pinned(false));
     let tabs = JsFuture::from(tabs)
         .await
@@ -95,25 +95,23 @@ async fn get_tabs() -> Vec<EagerTab> {
         .iter()
         .map(|tab| tab.unchecked_into::<Tab>().eager())
         .sorted()
-        .collect();
+        .collect::<Vec<_>>()
+        .into();
     tabs
 }
 
-#[inline_props]
-fn tab_group_output<'a>(
-    cx: Scope<'a>,
-    tabs: &'a [EagerTab],
-    group_by: GroupBy,
-    display_max: usize,
-) -> Element<'a> {
-    let closed = use_state(cx, || 0);
-    let to_close = use_state(cx, || 0);
-    let close_tabs = use_coroutine(cx, |mut rx: UnboundedReceiver<Vec<TabId>>| {
+#[component]
+fn tab_group_output(tabs: Arc<Vec<EagerTab>>, group_by: GroupBy, display_max: usize) -> Element {
+    let closed = use_signal(|| 0);
+    let to_close = use_signal(|| 0);
+    let close_tabs = use_coroutine(move |mut rx: UnboundedReceiver<Vec<TabId>>| {
+        let mut to_close = to_close.clone();
         let mut closed = closed.clone();
         async move {
             let tabs = tabs::api();
             loop {
                 while let Some(remove) = rx.next().await {
+                    to_close.set(to_close() + remove.len());
                     for remove in remove {
                         JsFuture::from(tabs.remove(remove)).await.expect("TODO");
                         closed += 1;
@@ -125,11 +123,11 @@ fn tab_group_output<'a>(
     });
     let todo = format!(
         "{closed} closed, {} pending, {} total.",
-        **to_close - **closed,
-        tabs.len() - **closed
+        to_close() - closed(),
+        tabs.len() - closed()
     );
     let keyname = group_by.name();
-    cx.render(rsx! {
+    rsx! {
         h2 { "Tabs by {keyname}" }
         p {
             "{todo}"
@@ -145,29 +143,25 @@ fn tab_group_output<'a>(
                 }
             }
             tab_group_rows {
-                tabs: tabs,
+                tabs,
                 group_by: group_by.clone(),
-                display_max: *display_max,
-                close_tabs: move |tabs| {
-                    to_close.set(*to_close.current() + tabs.len()); // += causes lifetime issues. -.-
-                    close_tabs.send(tabs);
-                }
+                display_max,
+                close_tabs,
             }
         }
-    })
+    }
 }
 
-#[inline_props]
-fn tab_group_rows<'a, F: Fn(Vec<TabId>)>(
-    cx: Scope<'a>,
-    tabs: &'a [EagerTab],
+#[component]
+fn tab_group_rows(
+    tabs: Arc<Vec<EagerTab>>,
     group_by: GroupBy,
     display_max: usize,
-    close_tabs: F,
-) -> Element<'a> {
+    close_tabs: Coroutine<Vec<u32>>,
+) -> Element {
     log!("Re!");
-    let same = group_tabs(tabs.to_vec(), *group_by, *display_max);
-    cx.render(rsx! {
+    let same = group_tabs(tabs.to_vec(), group_by, display_max);
+    rsx! {
         for (url, tabs) in same {
             Fragment {
                 key: "{url}",
@@ -175,11 +169,11 @@ fn tab_group_rows<'a, F: Fn(Vec<TabId>)>(
                     id: url.to_string(),
                     url: url.to_string(),
                     tabs: tabs.to_vec(),
-                    close_tabs: close_tabs,
+                    close_tabs,
                 }
             }
         }
-    })
+    }
 }
 
 #[cached(size = 1)]
@@ -217,45 +211,50 @@ fn group_tabs(
     same
 }
 
-#[inline_props]
-fn tab_group<F: Fn(Vec<TabId>)>(
-    cx: Scope,
+#[component]
+fn tab_group(
     id: String,
-    close_tabs: F,
     url: String,
     tabs: Vec<TabId>,
+    close_tabs: Coroutine<Vec<u32>>,
 ) -> Element {
     let _ = id;
-    let pressed = use_state(cx, || false);
-    let pressed_hidden = match **pressed {
+    let mut pressed = use_signal(|| false);
+    let pressed_hidden = match pressed() {
         true => "visibility: hidden",
         false => "",
     };
-    let pressed_crossedout = match **pressed {
+    let pressed_crossedout = match pressed() {
         true => "text-decoration: line-through; text-color: #7f000;",
         false => "",
     };
-    cx.render(rsx! {
+    rsx! {
         tr {
             id: "{url}",
             td {
                 style: pressed_hidden,
                 button {
                     id: "{url}-all",
-                    onclick: move |_| {
-                        pressed.set(true);
-                        if !pressed {
-                            close_tabs(tabs.clone());
+                    onclick: {
+                        let tabs = tabs.clone();
+                        move |_| {
+                            if !pressed() {
+                                close_tabs.send(tabs.clone());
+                            }
+                            pressed.set(true);
                         }
                     },
                     "all"
                 }
                 button {
                     id: "{url}-dups",
-                    onclick: move |_| {
-                        pressed.set(true);
-                        if !pressed {
-                            close_tabs(tabs.iter().cloned().skip(1).collect());
+                    onclick: {
+                        let tabs = tabs.clone();
+                        move |_| {
+                            if !pressed() {
+                                close_tabs.send(tabs.iter().cloned().skip(1).collect());
+                            }
+                            pressed.set(true);
                         }
                     },
                     "dups"
@@ -268,7 +267,7 @@ fn tab_group<F: Fn(Vec<TabId>)>(
             }
             td { "{url}" }
         }
-    })
+    }
 }
 
 static TLDEX: Lazy<TldExtractor> =

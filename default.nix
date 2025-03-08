@@ -1,12 +1,12 @@
 {
   lib,
-  wasm-bindgen-cli_0_2_93, # likely, I'll have to switch to buildWasmBindgenCli in the not-too-far future
+  wasm-bindgen-cli_0_2_100, # likely, I'll have to switch to buildWasmBindgenCli in the not-too-far future
   rustc,
   rustPlatform,
   stdenv,
   just,
   cargo,
-  web-ext,
+  zip,
 }:
 stdenv.mkDerivation {
   pname = "rowserext";
@@ -21,9 +21,9 @@ stdenv.mkDerivation {
     just
     rustc.llvmPackages.lld
     cargo
-    wasm-bindgen-cli_0_2_93
+    wasm-bindgen-cli_0_2_100
     rustPlatform.cargoSetupHook
-    web-ext
+    zip
   ];
 
   postPatch = ''
@@ -32,19 +32,19 @@ stdenv.mkDerivation {
   '';
   env.CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
   buildPhase = ''
-    for ex in lionel join-on-time; do
+    mkdir $out
+    for ex in join-on-time lionel; do
+    # for ex in join-on-time; do
       pushd $ex
       just release
-      rm pkg/*.ts
+      zip -9X $out/$ex.xpi $(
+        find . -type f ! -name Cargo.\* ! -name \*.rs ! -name justfile \
+          -exec touch -t 198001010000 {} + -print
+      )
       popd
-      web-ext build -s $ex -a art -n $ex.xpi
     done
   '';
-  checkPhase = '''';
-  installPhase = ''
-    mkdir -p $out
-    cp -art $out art/*
-  '';
+  installPhase = "true";
 
   meta = with lib; {
     description = "Rust browser extensions";
