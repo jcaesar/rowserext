@@ -15,6 +15,9 @@ stdenv.mkDerivation {
   src = ./.;
   cargoDeps = rustPlatform.importCargoLock {
     lockFile = ./Cargo.lock;
+    outputHashes = {
+      "sledgehammer_bindgen_macro-0.6.0" = "sha256-cMQDVg5G7vzLHZakn6zEK+W7PvPgDZuevaDRZdATax4=";
+    };
   };
 
   nativeBuildInputs = [
@@ -39,7 +42,8 @@ stdenv.mkDerivation {
       just release
       zip -9X $out/$ex.xpi $(
         find . -type f ! -name Cargo.\* ! -name \*.rs ! -name justfile \
-          -exec touch -t 198001010000 {} + -print
+          -exec touch -t 198001010000 {} + -print \
+        | sort
       )
       popd
     done

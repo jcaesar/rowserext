@@ -1357,7 +1357,7 @@ checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 
 [[package]]
 name = "join-on-time"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
@@ -1916,8 +1916,7 @@ dependencies = [
 [[package]]
 name = "sledgehammer_bindgen_macro"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33a1b4f13e2bbf2f5b29d09dfebc9de69229ffee245aed80e3b70f9b5fd28c06"
+source = "git+https://github.com/jcaesar/fork2pr_sledgehammer_bindgen?rev=c759274d5e6b4b15b7e69652ae9bff26e29319b6#c759274d5e6b4b15b7e69652ae9bff26e29319b6"
 dependencies = [
  "quote",
  "syn",

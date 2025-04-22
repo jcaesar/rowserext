@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Join Teams on Time",
-  "version": "0.1",
+  "version": "0.1.1",
   "description": "Join a Teams meeting at a specified time",
   "browser_specific_settings": {
     "gecko": {

@@ -12,3 +12,7 @@ lto = "fat"
 codegen-units = 1
 strip = "debuginfo"
 panic = "abort"
+
+[patch.crates-io.sledgehammer_bindgen_macro]
+git = "https://github.com/jcaesar/fork2pr_sledgehammer_bindgen"
+rev = "c759274d5e6b4b15b7e69652ae9bff26e29319b6"
