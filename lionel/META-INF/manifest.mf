@@ -1,0 +1,100 @@
+Manifest-Version: 1.0
+
+Name: manifest.json
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: FgUDMM4G0/69huGpvjbtrqieyeI=
+SHA256-Digest: zE8XKxmsEy6AfsROB43ruMNCkg1WYV17Hp3fTqHNZrA=
+
+Name: load.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: 1Hfoqe/QCph3h6bBdOVK+S3M6kQ=
+SHA256-Digest: YtQEz2F4Ayie91IRCSYnCZfMOPAR85UcjlWBqvByMYk=
+
+Name: index.html
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: kv2ciEptdGMaqpGsi+FXhzAZ8oQ=
+SHA256-Digest: wUQ2W9SRNrc4pG2MAu+n+EBU+nIxrc9XqhoqtAII07Y=
+
+Name: action.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: YMgsKpZI75Wt8xBR+OFZEnnbbIA=
+SHA256-Digest: NnWy52cHJ0D5aFSqOdxxg+cdpHSfTjexuwnHySwDn5c=
+
+Name: icon.svg
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: Hzb9uWWFoudcKOqjbme2IDrVal0=
+SHA256-Digest: qPehfhqPw9A4vSK8uRaLk/dB+Cz2ZLd/cgMU8Sagip0=
+
+Name: pkg/ext.d.ts
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: 39F/AsD2PFy2cMI4ama8Jf6zqzg=
+SHA256-Digest: Uo1pe43FVqRqsE+1fbYWmVVvKRKBKQqrtN/bFYTpMj0=
+
+Name: pkg/ext.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: kXhLZ9PxJN4+46PLLaHopd4kLDI=
+SHA256-Digest: wiLV3U3CDDMK738NACaTvJaByRqOa01f4AzPZqlV9Fw=
+
+Name: pkg/ext_bg.wasm
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: WZhDVf4YIECqQ3EoWSocJVxqOjw=
+SHA256-Digest: zAxv1IoZ9FwKlMRtQ1jRsnUC1vhreKhsv4mvzZECnB8=
+
+Name: pkg/ext_bg.wasm.d.ts
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: mQ+9HLKv3fIkVVHy4qitT/l8Ig0=
+SHA256-Digest: b6SKObtMm5GiUPPhSIXcfLDNy8Byu/D8E6G/FC/BV9w=
+
+Name: pkg/snippets/dioxus-cli-config-24e80746d3c500cd/inline0.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: gEUsvmFhYqeQGNjNE87IfWeDyDE=
+SHA256-Digest: BwJ/jMu5ujYZ3uuGEjNZTMq1gtfrPaNMqGVZyTKgnms=
+
+Name: pkg/snippets/dioxus-web-bf44d47c344f35d0/inline1.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: XapyvG0dBvv9SrR7YENMtYW+pJo=
+SHA256-Digest: GTaC71Q276X5/ztvtc4iUv1QSOrXSdwyVWucmkzSaig=
+
+Name: pkg/snippets/dioxus-web-bf44d47c344f35d0/inline0.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: 56BsCBdvPlxvkmcnofFD50SkwqA=
+SHA256-Digest: hT1E28nSaW6A1mwFbiHWnneyv2j5Y2gmvs0Cn2fIhKU=
+
+Name: pkg/snippets/dioxus-web-bf44d47c344f35d0/src/js/eval.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: IYt4PEgL0dHUGesIHcsh+R+TeOg=
+SHA256-Digest: u1QHFbOVLkHbnBAq1KpzZCu7vdDJoEsgnp3hqBYn+f0=
+
+Name: pkg/snippets/dioxus-interpreter-js-53424282ea002554/inline0.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: 1fKbHJB9kNt+Wlng9Yd53PDn3ts=
+SHA256-Digest: Si6bU+QSzSGprLiIbUP6suGPESoEgsd1CnjQ+y2a3yk=
+
+Name: pkg/snippets/dioxus-interpreter-js-53424282ea002554/src/js/patch_
+ console.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: xVBAMMBnqCsxiq/xOiQLxTcQlcg=
+SHA256-Digest: mHYRFgksbyRIpU979ilY/BFZNdood173JdOU14R4y/E=
+
+Name: pkg/snippets/dioxus-interpreter-js-53424282ea002554/src/js/hydrat
+ e.js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: ZQtOhhdPSclFZW5S2KqinihlUIs=
+SHA256-Digest: TLUFQdsW8tfi1RamEGi8rKznCz+uhkWyoEa2A1l0n34=
+
+Name: pkg/snippets/dioxus-interpreter-js-53424282ea002554/src/js/common
+ .js
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: +Jv9W4np7vk/pE3yCM7yHP45PXI=
+SHA256-Digest: B2oT98NN+hY8qTnLYonSSvOIp7nLo33QtT5SPuDBUeU=
+
+Name: META-INF/cose.manifest
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: 75VRbpE/e2JzYmRw9zx1HvXn9gc=
+SHA256-Digest: UUsZuSdzLO8lc61n+YU9I5xPgffuADbLn1hbMveS4cA=
+
+Name: META-INF/cose.sig
+Digest-Algorithms: SHA1 SHA256
+SHA1-Digest: HadpCx6v//B5KG9oWhcP7a6LwZY=
+SHA256-Digest: Ti5jN292Bc28HFhiRZIHxu+PiwA9RCSzvccFhpcvU+E=
+
